@@ -96,8 +96,10 @@ statefulset:
 storage:
   persistentVolume:
     enabled: true
+    size: 350Gi
     storageClass: csi-driver-lvm-striped-xfs
   tiered:
+    mountType: none
     config:
       cloud_storage_enabled: true
       cloud_storage_api_endpoint: storage.googleapis.com

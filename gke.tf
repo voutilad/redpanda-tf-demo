@@ -195,12 +195,12 @@ resource "kubernetes_storage_class" "redpanda-nvme" {
         name = "csi-driver-lvm-striped-xfs"
     }
     storage_provisioner     = "lvm.csi.metal-stack.io"
-    reclaim_policy          = "Retain"
+    reclaim_policy          = "Delete"
     volume_binding_mode     = "WaitForFirstConsumer"
     allow_volume_expansion  = true
     parameters              = {
-        type                                = "striped"
-        "csi\\.storage\\.k8s\\.io\\/fstype" = "xfs"
+        type   = "striped"
+        fsType = "xfs"
     }
 
     depends_on = [ helm_release.csi-driver-lvm ]
