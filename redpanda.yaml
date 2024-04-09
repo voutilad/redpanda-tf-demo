@@ -1,0 +1,108 @@
+image:
+  repository: docker.redpanda.com/redpandadata/redpanda
+  tag: v23.3.10 # TODO: wire into terraform
+  pullPolicy: Always
+
+resources:
+  cpu:
+    cores: 3
+    # overprovisioned: true
+  memory:
+    enable_memory_locking: true
+    container:
+      min: 12Gi
+      max: 12Gi
+
+external:
+  domain: redpanda-labs.com # TODO: wire into terraform
+
+enterprise:
+  licenseSecretRef:
+    name: redpanda-license
+    key: redpanda.license
+
+console:
+  enabled: true
+  secret:
+    create: false      ## we set via environment
+  console:
+    config:
+      #server:
+      #  tls:
+      #    enabled: true
+      login:
+        enabled: true
+        # jwtSecret: <set via terraform>
+        # okta: { <set via terraform> }
+      enterprise:
+        rbac:
+          enabled: true
+          roleBindingsFilepath: /etc/console/configs/role-bindings.yaml
+    roleBindings: # TODO: wire into terraform
+      - metadata:
+          name: Admins
+        subjects:
+          - kind: group
+            provider: Okta
+            # name: <set via terraform>
+        roleName: admin
+      - metadata:
+          name: NotAdmins
+        subjects:
+          - kind: group
+            provider: Okta
+            # name: <set via terraform>
+        roleName: viewer
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: "gce"
+      # kubernetes.io/ingress.allow-http: "true"
+      networking.gke.io/managed-certificates: "console-managed-cert"
+      networking.gke.io/v1beta1.FrontendConfig: "ingress-security-config"
+      # kubernetes.io/ingress.global-static-ip-name: <set via terraform>
+    # tls: [{ secretName: ..., hosts: [] }] <set via GKE>
+    hosts:
+      - paths:
+          - path: /
+            pathType: Prefix
+        # host: <set via terraform> 
+        
+auth:
+  sasl:
+    enabled: true
+    # secretRef: <set via terraform>
+    users: []
+
+tls:
+  enabled: true
+
+serviceAccount:
+  create: false
+# name set via terraform
+
+rbac:
+  enabled: true
+
+statefulset:
+  budget:
+    maxUnavailable: 1
+  initContainers:
+    setDataDirOwnership:
+      enabled: true
+  # additionalRedpandaCmdFlags:
+  #   - '--logger-log-level=s3=trace:cloud_roles=trace'
+
+storage:
+  persistentVolume:
+    enabled: true
+    storageClass: csi-driver-lvm-striped-xfs
+  tiered:
+    config:
+      cloud_storage_enabled: true
+      cloud_storage_api_endpoint: storage.googleapis.com
+      cloud_storage_credentials_source: gcp_instance_metadata
+      cloud_storage_enable_remote_write: true
+      cloud_storage_enable_remote_read: true
+      # cloud_storage_region: <set by terraform>
+      # cloud_storage_bucket: <set by terraform>

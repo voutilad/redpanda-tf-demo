@@ -442,6 +442,16 @@ resource "helm_release" "redpanda" {
         value   = kubernetes_secret.okta-secrets.metadata[0].name
     }
 
+    # Hook up Okta role mappings
+    set {
+        name = "console.console.roleBindings[0].subjects[0].name"
+        value = var.okta_admin_groupid
+    }
+    set {
+        name = "console.console.roleBindings[1].subjects[0].name"
+        value = var.okta_viewer_groupid
+    }
+    
     # Configure the Ingress for Console
     set {
         name    = "console.ingress.annotations.kubernetes\\.io/ingress\\.global-static-ip-name"

@@ -71,3 +71,15 @@ variable "okta_clientsecret" {
     sensitive   = true
     type        = string
 }
+
+variable "okta_admin_groupid" {
+    description = "Okta group id for the Redpanda Admin group."
+    type        = string
+}
+
+variable "okta_viewer_groupid" {
+    description = "Okta group id for the Redpanda Viewer group."
+    type        = string
+}
+
+# TODO: editor group
