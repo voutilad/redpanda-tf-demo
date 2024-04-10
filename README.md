@@ -49,3 +49,12 @@ After 10-15 minutes you should be able to access your cluster via:
 ## Okta Config
 
 This part needs to be documented a bit...TBD. Currently this demo uses two roles: `admin` and `viewer`.
+
+## Known Issues
+
+* When doing a destroy, the SslPolicy instance cannot be removed. Need to find a way to properly order the destruction. Manually removing it is necessary for now.
+    ```
+    google_compute_network.vpc: Destruction complete after 32s
+    ╷
+    │ Error: Error when reading or editing SslPolicy: googleapi: Error 400: The ssl_policy resource 'projects/sandbox-customer-success/global/sslPolicies/redpanda-console-ssl-policy' is already being used by 'projects/sandbox-customer-success/global/targetHttpsProxies/k8s2-ts-hku8jlii-redpanda-redpanda-console-t970bmmg', resourceInUseByAnotherResource
+    ```
