@@ -287,7 +287,7 @@ resource "google_project_iam_custom_role" "redpanda-ts-role" {
 
 resource "google_project_iam_binding" "binding" {
     project = data.google_project.project.project_id
-    role    = "projects/${data.google_project.project.name}/roles/${google_project_iam_custom_role.redpanda-ts-role.role_id}"
+    role    = "projects/${data.google_project.project.project_id}/roles/${google_project_iam_custom_role.redpanda-ts-role.role_id}"
     members = [
         "principal://iam.googleapis.com/projects/${data.google_project.project.number}/locations/global/workloadIdentityPools/${data.google_project.project.project_id}.svc.id.goog/subject/ns/${kubernetes_namespace.redpanda-ns.metadata[0].name}/sa/${kubernetes_service_account.redpanda-sa.metadata[0].name}"
     ]
@@ -474,3 +474,7 @@ resource "helm_release" "redpanda" {
 
     depends_on = [ helm_release.cert_manager ]
 }
+
+### Google Managed Prometheus
+# GKE 1.27 has the exporters already available for us. Just need a CR.
+
